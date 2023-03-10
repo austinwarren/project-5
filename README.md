@@ -1,6 +1,12 @@
 # UOCIS322 - Project 5 #
 Brevet time calculator with MongoDB!
 
+Name: Austin Warren
+
+Description: In this application we are creating a calculator which calculates the opening and closing times for an ACP brevet. The main algorithm finds the open and close times at various brevet distances. There is an added MongoDB service to our flask app, which stores basic information in the database. It also fetches information from the database to fill in the form using them. To use docker, use the command "docker built -t myimage" in your command line. Then run "docker run -dp HOSTPORT:CONTAINERPORT myimage". After docker is running, type in "127.0.0.1:HOSTPORT" into your browser, and this should pull up the ACP Brevet Times calculator webpage. 
+
+Contact: awarren3@uoregon.edu
+
 ## Overview
 
 You'll add a storage to your previous project using MongoDB and `docker-compose`.
