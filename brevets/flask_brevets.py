@@ -1,7 +1,6 @@
 """
 Replacement for RUSA ACP brevet time calculator
 (see https://rusa.org/octime_acp.html)
-
 """
 
 import flask
@@ -52,57 +51,57 @@ def _calc_times():
     """
     app.logger.debug("Got a JSON request")
     km = request.args.get('km', 999, type=float)
-    dist_brevet = request.args.get('distance of Brevet', 999, type=float)
-    time = request.args.get('time', type=str)
+    
+
+    brevet_dist_km = request.args.get("brevet_dist_km", 999, type=float)
+    start_time = request.args.get("start_time", type=str)
+    start_time = arrow.get(start_time, "YYYY-MM-DDTHH:mm")
     app.logger.debug("km={}".format(km))
-    app.logger.debug("brevet distance={}".format(dist_brevet))
-    app.logger.debug("start time={}".format(time))
+    app.logger.debug("start_time={}".format(start_time))
+    app.logger.debug("brevet_dist_km={}".format(brevet_dist_km))
     app.logger.debug("request.args: {}".format(request.args))
+
     # FIXME!
     # Right now, only the current time is passed as the start time
     # and control distance is fixed to 200
     # You should get these from the webpage!
-    open_time = acp_times.open_time(km, dist_brevet, arrow.get(time)).format('YYYY-MM-DDTHH:mm')
-    close_time = acp_times.close_time(km, dist_brevet, arrow.get(time)).format('YYYY-MM-DDTHH:mm')
+    open_time = acp_times.open_time(km, brevet_dist_km, start_time).format('YYYY-MM-DDTHH:mm')
+    close_time = acp_times.close_time(km, brevet_dist_km, start_time).format('YYYY-MM-DDTHH:mm')
     result = {"open": open_time, "close": close_time}
     return flask.jsonify(result=result)
 
-
-@app.route("/insert_brevet", methods=["POST"])
-def insert_brevet():
+@app.route("/insert", methods=["POST"])
+def insert():
     try:
         input_json = request.json
-        start_time = input_json["start_time"]
-        brev_dist = input_json["brev_dist"]
-        checkpoints = input_json["checkpoints"]
-        
-        
-        return flask.jsonify(result={},
-                        message="Inserted!",
-                        status=1,
-                        mongo_id=insert_brevet(brev_dist, start_time, checkpoints)
-        )
+        brevet_dist_km = input_json["brevet_dist_km"] # Should be a string
+        start_time = input_json["start_time"] # Should be a string
+        checkpoints = input_json["checkpoints"] # Should be a list of dictionaries
 
+
+        return flask.jsonify(result={},
+                        message="Inserted!", 
+                        status=1,
+                        mongo_id=insert_brevet(brevet_dist_km, start_time, checkpoints))
     except:
         return flask.jsonify(result={},
-                        message="Oh no! Server error!",
-                        status=0,
+                        message="Oh no! Server error!", 
+                        status=0, 
                         mongo_id='None')
-
+    
 @app.route("/fetch_brevet")
 def fetch_brevet():
     try:
-        brev, start, checkpoints = get_brevet()
+        brevet_dist_km, start_time, checkpoints = get_brevet()
         return flask.jsonify(
-                result={"brev": brev, "start": start, "checkpoints": checkpoints}, 
+                result={"brevet_dist_km": brevet_dist_km, "start_time": start_time, "checkpoints": checkpoints}, 
                 status=1,
-                message="Successfully fetched a brevet distance!")
+                message="Successfully fetched a brevet list!")
     except:
         return flask.jsonify(
                 result={}, 
                 status=0,
-                message="Something went wrong, couldn't fetch any brevet distances!")
-
+                message="Something went wrong, couldn't fetch any lists!")
 
 #############
 
